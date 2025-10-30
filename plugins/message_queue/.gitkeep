@@ -1,0 +1,8 @@
+# Message Queue Plugins
+
+Add message broker plugins here:
+- RabbitMQ
+- Apache Kafka
+- Redis Streams
+- AWS SQS
+- ActiveMQ

@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-01-30T00:00:00Z",
+  "repository": "https://github.com/Arfni/arfni-plugins",
+  "categories": {
+    "framework": {
+      "name": "Framework Plugins",
+      "description": "Build and containerize applications",
+      "count": 1
+    },
+    "database": {
+      "name": "Database Plugins",
+      "description": "Persistent data storage solutions",
+      "count": 1
+    },
+    "cache": {
+      "name": "Cache Plugins",
+      "description": "High-speed in-memory data stores",
+      "count": 1
+    },
+    "message_queue": {
+      "name": "Message Queue Plugins",
+      "description": "Asynchronous messaging between services",
+      "count": 0
+    },
+    "proxy": {
+      "name": "Proxy Plugins",
+      "description": "Reverse proxies and load balancers",
+      "count": 0
+    },
+    "cicd": {
+      "name": "CI/CD Plugins",
+      "description": "Integrate deployment pipelines",
+      "count": 0
+    },
+    "orchestration": {
+      "name": "Orchestration Plugins",
+      "description": "Deploy to different platforms",
+      "count": 0
+    }
+  },
+  "plugins": [
+    {
+      "id": "django",
+      "name": "Django Framework",
+      "category": "framework",
+      "version": "1.0.0",
+      "description": "Production-ready Django web framework",
+      "author": "arfni-community",
+      "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django",
+      "path": "plugins/frameworks/django",
+      "provides": {
+        "frameworks": ["django"],
+        "service_kinds": []
+      },
+      "requires": {
+        "arfni_version": ">=0.2.0",
+        "docker_version": ">=20.10"
+      },
+      "tags": [
+        "python",
+        "django",
+        "backend",
+        "web-framework",
+        "orm",
+        "admin",
+        "wsgi",
+        "rest-api"
+      ],
+      "icon": "assets/django-icon.png",
+      "downloads": 0,
+      "stars": 0,
+      "verified": true,
+      "last_updated": "2025-01-30T00:00:00Z",
+      "status": "stable"
+    },
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL Database",
+      "category": "database",
+      "version": "1.0.0",
+      "description": "PostgreSQL relational database",
+      "author": "arfni-community",
+      "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/database/postgresql",
+      "path": "plugins/database/postgresql",
+      "provides": {
+        "frameworks": [],
+        "service_kinds": ["db.postgres"]
+      },
+      "requires": {
+        "arfni_version": ">=0.2.0",
+        "docker_version": ">=20.10"
+      },
+      "tags": [
+        "database",
+        "postgresql",
+        "postgres",
+        "sql",
+        "relational",
+        "rdbms",
+        "acid"
+      ],
+      "icon": "assets/postgresql-icon.png",
+      "downloads": 0,
+      "stars": 0,
+      "verified": true,
+      "last_updated": "2025-01-30T00:00:00Z",
+      "status": "stable"
+    }
+  ],
+  "stats": {
+    "total_plugins": 2,
+    "total_downloads": 0,
+    "categories_count": 7
+  }
+}
