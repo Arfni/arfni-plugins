@@ -54,31 +54,23 @@ analysis:
 serviceTemplate:
   kind: docker.container
   spec:
-    build:
-      context: "."
-      dockerfile: Dockerfile
+    build: "./apps/django"
 
     ports:
       - "8000:8000"
 
-    environment:
+    env:
       DEBUG: "False"
       SECRET_KEY: "${DJANGO_SECRET_KEY}"
       DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/django_db"
       ALLOWED_HOSTS: "*"
 
     volumes:
-      - host: ./media
-        mount: /app/media
-      - host: ./static
-        mount: /app/static
+      - { host: ./media, mount: /app/media }
+      - { host: ./static, mount: /app/static }
 
     health:
-      httpGet:
-        path: /health/
-        port: 8000
-      initialDelaySeconds: 30
-      periodSeconds: 10
+      httpGet: { path: /health/, port: 8000 }
 
 # Dockerfile template
 dockerfile:
