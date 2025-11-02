@@ -1,52 +1,54 @@
-# Framework Definition for Django
-# This file defines how Django appears in the ARFNI GUI
-
-apiVersion: v0.1
-
 metadata:
   name: django
   displayName: Django
-  description: High-level Python web framework with batteries included
-  version: 4.2
-  author: arfni-community
-  icon: assets/django-icon.png
+  version: "1.0.0"
+  description: "Django web framework for rapid development"
   category: runtime
-  tags:
-    - python
-    - backend
-    - orm
-    - admin
-    - web-framework
+  icon: django-icon.svg
+  author: "Arfni Plugins Team"
+  repository: "https://github.com/Arfni/arfni-plugins"
+  documentation: "https://docs.djangoproject.com/"
 
-# Auto-detection rules (how to detect Django projects)
+# Compatible with which stack versions
+compatibility:
+  minStackVersion: "0.1"
+  maxStackVersion: "1.0"
+
+# Supported project types/patterns
+supports:
+  - pattern: "requirements.txt"
+    required: true
+    description: "Python requirements file"
+
+  - pattern: "manage.py"
+    required: true
+    description: "Django management script"
+
+  - pattern: "*.wsgi.py"
+    required: false
+    description: "WSGI application file"
+
+# Auto-detection patterns from existing project
 detection:
-  files:
-    - manage.py
-    - requirements.txt
-  patterns:
-    - "*/settings.py"
-    - "*/wsgi.py"
-    - "*/asgi.py"
-  file_content:
-    - file: requirements.txt
-      contains: "Django"
-    - file: requirements.txt
-      contains: "django"
+  - file: manage.py
+    pattern: "django"
+    confidence: high
 
-# Project analysis rules (extract configuration from existing project)
+  - file: requirements.txt
+    pattern: "django"
+    confidence: high
+
+  - file: settings.py
+    pattern: "INSTALLED_APPS"
+    confidence: high
+
+# Analysis extractors for existing Django projects
 analysis:
-  - type: regex
-    file: requirements.txt
-    pattern: 'Django==(\d+\.\d+)'
+  - file: requirements.txt
+    pattern: "django==([0-9.]+)"
     capture: django_version
 
-  - type: regex
-    file: requirements.txt
-    pattern: 'Python\s*>=?\s*(\d+\.\d+)'
-    capture: python_version
-
-  - type: regex
-    file: "*/settings.py"
+  - file: settings.py
     pattern: "ALLOWED_HOSTS\\s*=\\s*\\[(.*?)\\]"
     capture: allowed_hosts
 
@@ -59,101 +61,16 @@ serviceTemplate:
     ports:
       - "8000:8000"
 
-    env:
-      DEBUG: "False"
-      SECRET_KEY: "${DJANGO_SECRET_KEY}"
-      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/django_db"
-      ALLOWED_HOSTS: "*"
+    # Only essential env vars, no hardcoded values
+    env: {}
 
-    volumes:
-      - { host: ./media, mount: /app/media }
-      - { host: ./static, mount: /app/static }
+    # Volumes can be customized by user
+    volumes: []
 
     health:
-      httpGet: { path: /health/, port: 8000 }
-
-# Dockerfile template
-dockerfile:
-  template: |
-    # Multi-stage Dockerfile for Django
-    # Build stage
-    FROM python:{{python_version}}-slim AS build
-
-    WORKDIR /app
-
-    # Install system dependencies
-    RUN apt-get update && apt-get install -y \
-        gcc \
-        postgresql-client \
-        libpq-dev \
-        python3-dev \
-        && rm -rf /var/lib/apt/lists/*
-
-    # Install Python dependencies
-    COPY requirements.txt .
-    RUN pip install --no-cache-dir --upgrade pip && \
-        pip install --no-cache-dir -r requirements.txt
-
-    # Production stage
-    FROM python:{{python_version}}-slim
-
-    WORKDIR /app
-
-    # Install runtime dependencies
-    RUN apt-get update && apt-get install -y \
-        libpq5 \
-        curl \
-        && rm -rf /var/lib/apt/lists/*
-
-    # Create non-root user
-    RUN useradd -m -u 1000 django && \
-        chown -R django:django /app
-
-    # Copy installed packages from build stage
-    COPY --from=build /usr/local/lib/python{{python_version}}/site-packages /usr/local/lib/python{{python_version}}/site-packages
-    COPY --from=build /usr/local/bin /usr/local/bin
-
-    # Copy application code
-    COPY --chown=django:django . .
-
-    # Create directories for media and static files
-    RUN mkdir -p /app/media /app/static && \
-        chown -R django:django /app/media /app/static
-
-    # Switch to non-root user
-    USER django
-
-    # Collect static files
-    RUN python manage.py collectstatic --noinput || echo "No static files to collect"
-
-    EXPOSE 8000
-
-    # Health check
-    HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-        CMD curl -f http://localhost:8000/health/ || exit 1
-
-    # Run with gunicorn
-    CMD ["gunicorn", \
-         "--bind", "0.0.0.0:8000", \
-         "--workers", "{{workers | default: 4}}", \
-         "--timeout", "120", \
-         "--access-logfile", "-", \
-         "--error-logfile", "-", \
-         "{{wsgi_application | default: 'myproject.wsgi:application'}}"]
-
-  variables:
-    python_version:
-      default: "3.11"
-      from_analysis: python_version
-      description: "Python runtime version"
-
-    workers:
-      default: 4
-      description: "Number of Gunicorn workers"
-
-    wsgi_application:
-      default: "myproject.wsgi:application"
-      description: "WSGI application path"
+      httpGet:
+        path: /health/
+        port: 8000
 
 # Property form for GUI (when user configures the node)
 propertyForm:
@@ -167,36 +84,221 @@ propertyForm:
       - "3.12"
     default: "3.11"
     description: "Python runtime version"
+    required: true
 
   - name: port
-    label: Port
+    label: Application Port
     type: number
     default: 8000
-    description: "Application port"
+    description: "Port for Django application"
+    required: true
+
+  - name: environment
+    label: Environment
+    type: select
+    options:
+      - development
+      - staging
+      - production
+    default: development
+    description: "Deployment environment"
+    required: true
 
   - name: debug
     label: Debug Mode
     type: boolean
     default: false
-    description: "Enable Django debug mode (not for production)"
+    description: "Enable Django debug mode (auto-disabled in production)"
+
+  - name: allowedHosts
+    label: Allowed Hosts
+    type: text
+    default: ""
+    placeholder: "localhost,127.0.0.1,example.com"
+    description: "Comma-separated list of allowed hosts (leave empty for development)"
+    required: false
 
   - name: secretKey
     label: Secret Key
     type: secret
-    default: "${DJANGO_SECRET_KEY}"
-    description: "Django secret key for cryptographic signing"
+    default: ""
+    placeholder: "Generate with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'"
+    description: "Django secret key (auto-generated if empty)"
+    required: false
 
   - name: workers
     label: Gunicorn Workers
     type: number
     default: 4
-    description: "Number of Gunicorn worker processes"
+    min: 1
+    max: 16
+    description: "Number of worker processes (recommended: 2-4 x CPU cores)"
+    required: true
 
-  - name: enableAdmin
-    label: Enable Admin Panel
+  - name: wsgiApplication
+    label: WSGI Application
+    type: text
+    default: ""
+    placeholder: "myproject.wsgi:application"
+    description: "Path to WSGI application (auto-detected if empty)"
+    required: false
+
+  - name: enableStaticFiles
+    label: Enable Static Files
     type: boolean
     default: true
-    description: "Enable Django admin interface"
+    description: "Collect and serve static files"
+
+  - name: enableMediaFiles
+    label: Enable Media Files
+    type: boolean
+    default: true
+    description: "Enable media file uploads"
+
+  - name: volumeConfig
+    label: Volume Configuration
+    type: group
+    fields:
+      - name: mediaPath
+        label: Media Files Path
+        type: text
+        default: "./media"
+        description: "Host path for media files"
+        condition: "enableMediaFiles === true"
+
+      - name: staticPath
+        label: Static Files Path
+        type: text
+        default: "./static"
+        description: "Host path for static files"
+        condition: "enableStaticFiles === true"
+
+      - name: customVolumes
+        label: Additional Volumes
+        type: array
+        itemType: object
+        fields:
+          - name: hostPath
+            label: Host Path
+            type: text
+            required: true
+          - name: containerPath
+            label: Container Path
+            type: text
+            required: true
+        default: []
+        description: "Add custom volume mounts"
+
+  - name: databaseConfig
+    label: Database Configuration
+    type: group
+    fields:
+      - name: autoConnectDatabase
+        label: Auto-connect to Database
+        type: boolean
+        default: true
+        description: "Automatically configure DATABASE_URL when connected to a database"
+
+      - name: databaseUrl
+        label: Database URL (Override)
+        type: text
+        default: ""
+        placeholder: "postgresql://user:pass@host:port/dbname"
+        description: "Override auto-generated DATABASE_URL"
+        condition: "autoConnectDatabase === false"
+
+  - name: redisConfig
+    label: Cache Configuration
+    type: group
+    fields:
+      - name: autoConnectRedis
+        label: Auto-connect to Redis
+        type: boolean
+        default: false
+        description: "Automatically configure REDIS_URL when connected to Redis"
+
+      - name: redisUrl
+        label: Redis URL (Override)
+        type: text
+        default: ""
+        placeholder: "redis://host:6379/0"
+        description: "Override auto-generated REDIS_URL"
+        condition: "autoConnectRedis === false"
+
+  - name: loggingConfig
+    label: Logging Configuration
+    type: group
+    fields:
+      - name: logLevel
+        label: Log Level
+        type: select
+        options:
+          - DEBUG
+          - INFO
+          - WARNING
+          - ERROR
+          - CRITICAL
+        default: INFO
+        description: "Logging verbosity level"
+
+      - name: accessLog
+        label: Enable Access Logs
+        type: boolean
+        default: true
+        description: "Log HTTP access requests"
+
+      - name: errorLog
+        label: Enable Error Logs
+        type: boolean
+        default: true
+        description: "Log application errors"
+
+# Connection handlers (for automatic configuration)
+connections:
+  - type: database
+    handler: generateDatabaseUrl
+    targetEnv: DATABASE_URL
+    condition: "databaseConfig.autoConnectDatabase === true"
+
+  - type: cache
+    handler: generateRedisUrl
+    targetEnv: REDIS_URL
+    condition: "redisConfig.autoConnectRedis === true"
+
+# Dynamic configuration based on connections
+dynamicConfig:
+  # When connected to PostgreSQL
+  - trigger:
+      connectionType: database
+      targetType: postgres
+    actions:
+      - addEnv:
+          DATABASE_URL: "postgresql://{{target.user}}:{{target.password}}@{{target.name}}:{{target.port}}/{{target.database}}"
+      - addPackage:
+          name: psycopg2-binary
+          version: ">=2.9"
+
+  # When connected to MySQL
+  - trigger:
+      connectionType: database
+      targetType: mysql
+    actions:
+      - addEnv:
+          DATABASE_URL: "mysql://{{target.user}}:{{target.password}}@{{target.name}}:{{target.port}}/{{target.database}}"
+      - addPackage:
+          name: mysqlclient
+          version: ">=2.0"
+
+  # When connected to Redis
+  - trigger:
+      connectionType: cache
+      targetType: redis
+    actions:
+      - addEnv:
+          REDIS_URL: "redis://{{target.name}}:{{target.port}}/0"
+      - addPackage:
+          name: django-redis
+          version: ">=5.0"
 
 # Common dependencies (suggested when adding Django)
 commonDependencies:
@@ -204,79 +306,81 @@ commonDependencies:
   - redis
   - nginx
 
-# Secrets this framework requires
-secrets:
+# Secrets this framework might need (not required)
+suggestedSecrets:
   - DJANGO_SECRET_KEY
   - DATABASE_PASSWORD
-  - POSTGRES_PASSWORD
 
 # Example configurations
 examples:
-  - name: Basic Django
-    description: Simple Django application
-    spec:
-      ports:
-        - "8000:8000"
-      env:
-        DEBUG: "True"
-
-  - name: Django + PostgreSQL
-    description: Django with PostgreSQL database
-    dependencies:
-      - postgres
-    spec:
-      ports:
-        - "8000:8000"
-      env:
-        DEBUG: "False"
-        DATABASE_URL: "postgresql://postgres:pass@postgres:5432/mydb"
+  - name: Development Setup
+    description: Simple Django for local development
+    propertyValues:
+      environment: development
+      debug: true
+      allowedHosts: "localhost,127.0.0.1"
+      workers: 2
+      enableStaticFiles: true
+      enableMediaFiles: false
 
   - name: Production Setup
-    description: Full production setup with Nginx and Redis
-    dependencies:
-      - postgres
-      - redis
-      - nginx
-    spec:
-      ports:
-        - "8000:8000"
-      env:
-        DEBUG: "False"
-        REDIS_URL: "redis://redis:6379/0"
-        ALLOWED_HOSTS: "example.com,www.example.com"
+    description: Production-ready Django configuration
+    propertyValues:
+      environment: production
+      debug: false
+      allowedHosts: "example.com,www.example.com"
+      workers: 4
+      enableStaticFiles: true
+      enableMediaFiles: true
+      loggingConfig:
+        logLevel: WARNING
 
 # Middleware and extensions
 middleware:
   - name: CORS
     package: django-cors-headers
     description: "Handle Cross-Origin Resource Sharing"
+    optional: true
 
   - name: REST Framework
     package: djangorestframework
-    description: "Build Web APIs"
+    description: "Build RESTful APIs"
+    optional: true
 
   - name: Celery
     package: celery
-    description: "Distributed task queue"
+    description: "Asynchronous task queue"
+    optional: true
 
-# Common Django commands
-commands:
-  - name: makemigrations
-    description: "Create new migrations"
-    command: "python manage.py makemigrations"
+# Health check endpoints
+healthCheck:
+  default:
+    path: /health/
+    interval: 30
+    timeout: 10
+    retries: 3
 
-  - name: migrate
-    description: "Apply database migrations"
-    command: "python manage.py migrate"
+  custom:
+    - name: Database Check
+      path: /health/db/
+      description: "Check database connectivity"
 
-  - name: createsuperuser
-    description: "Create admin user"
-    command: "python manage.py createsuperuser --noinput"
+    - name: Redis Check
+      path: /health/redis/
+      description: "Check Redis connectivity"
 
-  - name: collectstatic
-    description: "Collect static files"
-    command: "python manage.py collectstatic --noinput"
+# Container settings
+container:
+  user: django
+  uid: 1000
+  workdir: /app
 
-  - name: shell
-    description: "Open Django shell"
-    command: "python manage.py shell"
+# Resource recommendations
+resources:
+  development:
+    memory: "512Mi"
+    cpu: "0.5"
+
+  production:
+    memory: "2Gi"
+    cpu: "1.0"
