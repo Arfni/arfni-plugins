@@ -1,0 +1,173 @@
+# ARFNI Plugin Manifest - Django Framework
+apiVersion: v0.1
+name: django
+version: 1.0.0
+category: framework
+description: Production-ready Django web framework
+author: arfni-community
+homepage: https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django
+license: MIT
+
+# Plugin provides
+provides:
+  frameworks:
+    - django
+  service_kinds: []  # Framework plugins don't add custom service kinds
+
+# Compatibility
+requires:
+  arfni_version: ">=0.2.0"
+  docker_version: ">=20.10"
+
+# User inputs
+inputs:
+  python_version:
+    description: "Python runtime version"
+    type: select
+    options:
+      - "3.9"
+      - "3.10"
+      - "3.11"
+      - "3.12"
+    default: "3.11"
+    required: true
+
+  django_port:
+    description: "Django application port"
+    type: number
+    default: 8000
+    required: true
+
+  django_secret_key:
+    description: "Django SECRET_KEY for cryptographic signing"
+    type: secret
+    required: true
+    env_var: DJANGO_SECRET_KEY
+
+  database_url:
+    description: "Database connection URL (automatically set when connecting DB service in canvas)"
+    type: text
+    placeholder: "postgresql://user:pass@postgres:5432/dbname"
+    required: false
+    env_var: DATABASE_URL
+
+  redis_url:
+    description: "Redis connection URL (automatically set when connecting Redis service in canvas)"
+    type: text
+    placeholder: "redis://redis:6379/0"
+    required: false
+    env_var: REDIS_URL
+
+  debug_mode:
+    description: "Enable Django debug mode (not recommended for production)"
+    type: boolean
+    default: false
+    required: false
+
+  gunicorn_workers:
+    description: "Number of Gunicorn worker processes"
+    type: number
+    default: 4
+    required: false
+
+# Service contributions to stack.yaml
+contributes:
+  services:
+    django:
+      kind: docker.container
+      target: "{{target}}"
+      spec:
+        build:
+          context: "{{project_dir}}"
+          dockerfile: Dockerfile
+        ports:
+          - "{{django_port}}:8000"
+        environment:
+          DEBUG: "{{debug_mode}}"
+          SECRET_KEY: "{{django_secret_key}}"
+          DATABASE_URL: "{{database_url}}"
+          REDIS_URL: "{{redis_url}}"
+          ALLOWED_HOSTS: "*"
+        health:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumes:
+          - host: ./media
+            mount: /app/media
+          - host: ./static
+            mount: /app/static
+
+  volumes: []
+
+# Lifecycle hooks
+hooks:
+  pre_generate:
+    script: hooks/validate-project.sh
+    description: "Validate Django project structure"
+
+  post_build:
+    script: hooks/collect-static.sh
+    description: "Collect Django static files"
+
+  pre_deploy:
+    script: hooks/migrate-database.sh
+    description: "Run Django database migrations"
+
+  post_deploy:
+    script: hooks/create-superuser.sh
+    description: "Create Django superuser if needed"
+
+  health_check:
+    script: hooks/health-check.sh
+    description: "Verify Django application health"
+
+# Template files
+templates:
+  - source: templates/Dockerfile.django.tmpl
+    target: "{{project_dir}}/Dockerfile"
+    description: "Multi-stage Dockerfile for Django"
+    overwrite: false
+
+  - source: templates/settings_production.py.tmpl
+    target: "{{project_dir}}/settings_production.py"
+    description: "Production settings for Django"
+    overwrite: false
+
+# Framework definition for GUI
+frameworks:
+  - source: frameworks/django.yaml
+    category: runtime
+    icon: assets/django-icon.png
+
+# Example projects
+examples:
+  - name: basic-blog
+    description: "Simple Django blog application"
+    path: examples/basic-blog/
+
+  - name: rest-api
+    description: "Django REST API with JWT authentication"
+    path: examples/rest-api/
+
+# Documentation
+documentation:
+  readme: README.md
+  getting_started: docs/getting-started.md
+  troubleshooting: docs/troubleshooting.md
+
+# Tags for discovery
+tags:
+  - python
+  - django
+  - backend
+  - web-framework
+  - orm
+  - admin
+  - wsgi
+  - rest-api
+
+# Changelog
+changelog: CHANGELOG.md
