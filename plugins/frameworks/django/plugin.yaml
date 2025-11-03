@@ -8,6 +8,17 @@ author: arfni-community
 homepage: https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django
 license: MIT
 
+# Framework detection
+detection:
+  enabled: true
+  priority: 15
+  required_files:
+    - manage.py
+    - requirements.txt
+  file_content_patterns:
+    requirements.txt:
+      contains: ["django", "Django"]
+
 # Plugin provides
 provides:
   frameworks:
@@ -82,12 +93,6 @@ contributes:
           dockerfile: Dockerfile
         ports:
           - "{{django_port}}:8000"
-        environment:
-          DEBUG: "{{debug_mode}}"
-          SECRET_KEY: "{{django_secret_key}}"
-          DATABASE_URL: "{{database_url}}"
-          REDIS_URL: "{{redis_url}}"
-          ALLOWED_HOSTS: "*"
         health:
           httpGet:
             path: /health/
