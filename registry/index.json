@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "version": "1.0.0",
-  "last_updated": "2025-11-03T08:56:12.659Z",
+  "last_updated": "2025-11-03T17:54:28.317Z",
   "repository": "https://github.com/Arfni/arfni-plugins",
   "categories": {
     "framework": {
@@ -86,7 +86,7 @@
       "stars": 0,
       "verified": true,
       "status": "stable",
-      "last_updated": "2025-11-03T08:56:12.657Z",
+      "last_updated": "2025-11-03T17:54:28.315Z",
       "documentation": {
         "readme": "README.md",
         "getting_started": "docs/getting-started.md",
@@ -132,7 +132,7 @@
       "stars": 0,
       "verified": true,
       "status": "stable",
-      "last_updated": "2025-11-03T08:56:12.658Z",
+      "last_updated": "2025-11-03T17:54:28.316Z",
       "documentation": {
         "readme": "README.md"
       }
@@ -142,6 +142,6 @@
     "total_plugins": 2,
     "total_downloads": 0,
     "categories_count": 8,
-    "last_sync": "2025-11-03T08:56:12.666Z"
+    "last_sync": "2025-11-03T17:54:28.324Z"
   }
 }
