@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "version": "1.0.0",
-  "last_updated": "2025-11-03T08:21:45.244Z",
+  "last_updated": "2025-11-03T08:47:12.790Z",
   "repository": "https://github.com/Arfni/arfni-plugins",
   "categories": {
     "framework": {
@@ -86,54 +86,7 @@
       "stars": 0,
       "verified": true,
       "status": "stable",
-      "last_updated": "2025-11-03T08:21:45.240Z",
-      "documentation": {
-        "readme": "README.md",
-        "getting_started": "docs/getting-started.md",
-        "troubleshooting": "docs/troubleshooting.md"
-      }
-    },
-    {
-      "id": "django",
-      "name": "Django",
-      "category": "framework",
-      "version": "1.0.0",
-      "description": "Production-ready Django web framework",
-      "author": "arfni-community",
-      "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django",
-      "license": "MIT",
-      "path": "plugins/frameworks/test_framework",
-      "repository": {
-        "owner": "Arfni",
-        "repo": "arfni-plugins",
-        "branch": "main"
-      },
-      "provides": {
-        "frameworks": [
-          "django"
-        ],
-        "service_kinds": []
-      },
-      "requires": {
-        "arfni_version": ">=0.2.0",
-        "docker_version": ">=20.10"
-      },
-      "tags": [
-        "python",
-        "django",
-        "backend",
-        "web-framework",
-        "orm",
-        "admin",
-        "wsgi",
-        "rest-api"
-      ],
-      "icon": "icon.png",
-      "downloads": 0,
-      "stars": 0,
-      "verified": true,
-      "status": "stable",
-      "last_updated": "2025-11-03T08:21:45.241Z",
+      "last_updated": "2025-11-03T08:47:12.786Z",
       "documentation": {
         "readme": "README.md",
         "getting_started": "docs/getting-started.md",
@@ -180,7 +133,7 @@
       "stars": 0,
       "verified": true,
       "status": "stable",
-      "last_updated": "2025-11-03T08:21:45.243Z",
+      "last_updated": "2025-11-03T08:47:12.789Z",
       "documentation": {
         "readme": "README.md",
         "getting_started": "docs/getting-started.md",
@@ -226,9 +179,56 @@
       "stars": 0,
       "verified": true,
       "status": "stable",
-      "last_updated": "2025-11-03T08:21:45.243Z",
+      "last_updated": "2025-11-03T08:47:12.790Z",
       "documentation": {
         "readme": "README.md"
+      }
+    },
+    {
+      "id": "test",
+      "name": "Test",
+      "category": "framework",
+      "version": "1.0.0",
+      "description": "Production-ready Django web framework",
+      "author": "arfni-community",
+      "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django",
+      "license": "MIT",
+      "path": "plugins/frameworks/test_framework",
+      "repository": {
+        "owner": "Arfni",
+        "repo": "arfni-plugins",
+        "branch": "main"
+      },
+      "provides": {
+        "frameworks": [
+          "django"
+        ],
+        "service_kinds": []
+      },
+      "requires": {
+        "arfni_version": ">=0.2.0",
+        "docker_version": ">=20.10"
+      },
+      "tags": [
+        "python",
+        "django",
+        "backend",
+        "web-framework",
+        "orm",
+        "admin",
+        "wsgi",
+        "rest-api"
+      ],
+      "icon": "icon.png",
+      "downloads": 0,
+      "stars": 0,
+      "verified": true,
+      "status": "stable",
+      "last_updated": "2025-11-03T08:47:12.788Z",
+      "documentation": {
+        "readme": "README.md",
+        "getting_started": "docs/getting-started.md",
+        "troubleshooting": "docs/troubleshooting.md"
       }
     }
   ],
@@ -236,6 +236,6 @@
     "total_plugins": 4,
     "total_downloads": 0,
     "categories_count": 8,
-    "last_sync": "2025-11-03T08:21:45.251Z"
+    "last_sync": "2025-11-03T08:47:12.797Z"
   }
 }
