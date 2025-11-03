@@ -1,6 +1,7 @@
 {
+  "schema_version": "1.0.0",
   "version": "1.0.0",
-  "last_updated": "2025-01-30T00:00:00Z",
+  "last_updated": "2025-11-02T12:06:49.423Z",
   "repository": "https://github.com/Arfni/arfni-plugins",
   "categories": {
     "framework": {
@@ -16,7 +17,7 @@
     "cache": {
       "name": "Cache Plugins",
       "description": "High-speed in-memory data stores",
-      "count": 1
+      "count": 0
     },
     "message_queue": {
       "name": "Message Queue Plugins",
@@ -37,20 +38,33 @@
       "name": "Orchestration Plugins",
       "description": "Deploy to different platforms",
       "count": 0
+    },
+    "infrastructure": {
+      "name": "Infrastructure Plugins",
+      "description": "Infrastructure as code and configuration management",
+      "count": 0
     }
   },
   "plugins": [
     {
       "id": "django",
-      "name": "Django Framework",
+      "name": "Django",
       "category": "framework",
       "version": "1.0.0",
       "description": "Production-ready Django web framework",
       "author": "arfni-community",
       "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django",
+      "license": "MIT",
       "path": "plugins/frameworks/django",
+      "repository": {
+        "owner": "Arfni",
+        "repo": "arfni-plugins",
+        "branch": "main"
+      },
       "provides": {
-        "frameworks": ["django"],
+        "frameworks": [
+          "django"
+        ],
         "service_kinds": []
       },
       "requires": {
@@ -67,25 +81,38 @@
         "wsgi",
         "rest-api"
       ],
-      "icon": "assets/django-icon.png",
+      "icon": "icon.png",
       "downloads": 0,
       "stars": 0,
       "verified": true,
-      "last_updated": "2025-01-30T00:00:00Z",
-      "status": "stable"
+      "status": "stable",
+      "last_updated": "2025-11-02T12:06:49.421Z",
+      "documentation": {
+        "readme": "README.md",
+        "getting_started": "docs/getting-started.md",
+        "troubleshooting": "docs/troubleshooting.md"
+      }
     },
     {
       "id": "postgresql",
-      "name": "PostgreSQL Database",
+      "name": "Postgresql",
       "category": "database",
       "version": "1.0.0",
       "description": "PostgreSQL relational database",
       "author": "arfni-community",
       "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/database/postgresql",
+      "license": "MIT",
       "path": "plugins/database/postgresql",
+      "repository": {
+        "owner": "Arfni",
+        "repo": "arfni-plugins",
+        "branch": "main"
+      },
       "provides": {
-        "frameworks": [],
-        "service_kinds": ["db.postgres"]
+        "service_kinds": [
+          "db.postgres"
+        ],
+        "frameworks": []
       },
       "requires": {
         "arfni_version": ">=0.2.0",
@@ -100,17 +127,21 @@
         "rdbms",
         "acid"
       ],
-      "icon": "assets/postgresql-icon.png",
+      "icon": "icon.png",
       "downloads": 0,
       "stars": 0,
       "verified": true,
-      "last_updated": "2025-01-30T00:00:00Z",
-      "status": "stable"
+      "status": "stable",
+      "last_updated": "2025-11-02T12:06:49.423Z",
+      "documentation": {
+        "readme": "README.md"
+      }
     }
   ],
   "stats": {
     "total_plugins": 2,
     "total_downloads": 0,
-    "categories_count": 7
+    "categories_count": 8,
+    "last_sync": "2025-11-02T12:06:49.431Z"
   }
 }

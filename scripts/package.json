@@ -1,0 +1,24 @@
+{
+  "name": "arfni-plugin-registry-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for generating and managing the ARFNI plugin registry",
+  "main": "generate-registry.js",
+  "scripts": {
+    "generate": "node generate-registry.js",
+    "validate": "node generate-registry.js --validate-only"
+  },
+  "keywords": [
+    "arfni",
+    "plugins",
+    "registry"
+  ],
+  "author": "ARFNI Team",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "glob": "^10.3.10"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
