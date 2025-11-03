@@ -1,6 +1,6 @@
 # ARFNI Plugin Manifest - Django Framework
 apiVersion: v0.1
-name: django
+name: test
 version: 1.0.0
 category: framework
 description: Production-ready Django web framework
