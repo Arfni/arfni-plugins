@@ -1,12 +1,14 @@
 # ARFNI Plugin Manifest - Django Framework
 apiVersion: v0.1
 name: django
+displayName: Django
 version: 1.0.0
 category: framework
 description: Production-ready Django web framework
 author: arfni-community
 homepage: https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django
 license: MIT
+icon: icon.png
 
 # Framework detection
 detection:
@@ -104,6 +106,30 @@ contributes:
             mount: /app/media
           - host: ./static
             mount: /app/static
+
+  canvas:
+    nodeType: django
+    label: Django
+    description: "Python web framework with admin interface"
+    category: runtime
+    ports:
+      - name: http
+        port: 8000
+        protocol: tcp
+    connections:
+      inputs:
+        - type: database
+          name: database
+          protocol: any
+          env_var: DATABASE_URL
+        - type: cache
+          name: redis
+          protocol: tcp
+          env_var: REDIS_URL
+      outputs:
+        - type: api
+          name: api
+          protocol: http
 
   volumes: []
 

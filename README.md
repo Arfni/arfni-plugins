@@ -1,300 +1,603 @@
-# ARFNI Plugins
+# ARFNI Plugin Contribution Guide
 
-Central repository for ARFNI framework, infrastructure, CI/CD, and orchestration plugins.
+**English** | [한국어](README.ko.md)
 
-## Overview
+Welcome to the ARFNI plugin repository! This guide explains how to contribute new plugins to the ARFNI ecosystem.
 
-ARFNI Plugins provides a unified plugin system to extend ARFNI's capabilities across multiple domains:
+## Table of Contents
 
-- **Framework Plugins**: Build and containerize applications (Django, React, Spring Boot, etc.)
-- **Database Plugins**: Relational and NoSQL databases (PostgreSQL, MySQL, MongoDB, etc.)
-- **Cache Plugins**: In-memory caching and session storage (Redis, Memcached, etc.)
-- **Message Queue Plugins**: Asynchronous messaging (RabbitMQ, Kafka, etc.)
-- **Proxy Plugins**: Reverse proxies and load balancers (Nginx, Traefik, HAProxy, etc.)
-- **CI/CD Plugins**: Integrate deployment pipelines (Jenkins, GitLab CI, GitHub Actions)
-- **Orchestration Plugins**: Deploy to different platforms (Kubernetes, Docker Swarm)
+- [What is a Plugin?](#what-is-a-plugin)
+- [Plugin Categories](#plugin-categories)
+- [Plugin Structure](#plugin-structure)
+- [Writing plugin.yaml](#writing-pluginyaml)
+- [Template Files](#template-files)
+- [Lifecycle Hooks](#lifecycle-hooks)
+- [Plugin Development Steps](#plugin-development-steps)
+- [Validation and Testing](#validation-and-testing)
+- [Submitting Your Plugin](#submitting-your-plugin)
+
+## What is a Plugin?
+
+An ARFNI plugin is an extension module that adds new frameworks, databases, and services to the ARFNI platform. With plugins, you can:
+
+- Add support for new frameworks (Django, Express, Spring, etc.)
+- Integrate databases and cache services
+- Enable automatic project detection and configuration
+- Auto-generate Docker containers
+- Support visual connections in the GUI canvas
 
 ## Plugin Categories
 
-### 🚀 Framework Plugins
+Plugins are organized into 8 categories:
 
-Help build and deploy application code.
-
-| Plugin | Description | Status |
-|--------|-------------|--------|
-| [Django](plugins/frameworks/django/) | Production-ready Django framework | ✅ Ready |
-| [React](plugins/frameworks/react/) | React frontend applications | 🚧 Coming Soon |
-| [Spring Boot](plugins/frameworks/spring-boot/) | Java enterprise framework | 🚧 Coming Soon |
-| [FastAPI](plugins/frameworks/fastapi/) | Modern Python API framework | 🚧 Coming Soon |
-
-**What they do**:
-- Detect project type from source code
-- Generate optimized Dockerfiles
-- Configure build processes
-- Multi-stage build optimization
-
-### 🗄️ Database Plugins
-
-Persistent data storage solutions.
-
-| Plugin | Description | Service Kind | Status |
-|--------|-------------|--------------|--------|
-| [PostgreSQL](plugins/database/postgresql/) | Production-grade relational database | `db.postgres` | ✅ Ready |
-| [MySQL](plugins/database/mysql/) | Popular relational database | `db.mysql` | 🚧 Coming Soon |
-| [MongoDB](plugins/database/mongodb/) | Document-oriented NoSQL database | `db.mongodb` | 🚧 Coming Soon |
-
-**What they do**:
-- Manage database containers
-- Configure persistent storage
-- Handle connection URLs
-- Set up authentication
-
-### 💾 Cache Plugins
-
-High-speed in-memory data stores.
-
-| Plugin | Description | Service Kind | Status |
-|--------|-------------|--------------|--------|
-| [Redis](plugins/cache/redis/) | In-memory cache and session store | `cache.redis` | ✅ Ready |
-| [Memcached](plugins/cache/memcached/) | Distributed memory caching | `cache.memcached` | 🚧 Coming Soon |
-
-**What they do**:
-- Provide in-memory caching
-- Session storage
-- Rate limiting
-- Temporary data storage
-
-### 📬 Message Queue Plugins
-
-Asynchronous messaging between services.
-
-| Plugin | Description | Service Kind | Status |
-|--------|-------------|--------------|--------|
-| [RabbitMQ](plugins/message_queue/rabbitmq/) | Robust message broker | `queue.rabbitmq` | 🚧 Coming Soon |
-| [Apache Kafka](plugins/message_queue/kafka/) | Distributed streaming platform | `queue.kafka` | 🚧 Coming Soon |
-
-**What they do**:
-- Enable pub/sub messaging
-- Task queues
-- Event streaming
-- Microservice communication
-
-### 🔌 Proxy Plugins
-
-Reverse proxies and load balancers.
-
-| Plugin | Description | Service Kind | Status |
-|--------|-------------|--------------|--------|
-| [Nginx](plugins/proxy/nginx/) | High-performance web server | `proxy.nginx` | 🚧 Coming Soon |
-| [Traefik](plugins/proxy/traefik/) | Modern reverse proxy | `proxy.traefik` | 🚧 Coming Soon |
-
-**What they do**:
-- Route HTTP traffic
-- Load balancing
-- SSL/TLS termination
-- Rate limiting
-
-### 🔧 CI/CD Plugins
-
-Integrate deployment into CI/CD pipelines.
-
-| Plugin | Description | Service Kind |
-|--------|-------------|--------------|
-| [Jenkins](plugins/cicd/jenkins/) | Automation server | `ci.jenkins` |
-| [GitLab CI](plugins/cicd/gitlab-ci/) | GitLab integrated CI/CD | N/A |
-
-**What they do**:
-- Generate pipeline definitions
-- Configure deployment triggers
-- Manage artifacts and credentials
-- Create deployment jobs
-
-### ☸️ Orchestration Plugins
-
-Deploy to different orchestration platforms.
-
-| Plugin | Description | Target Type |
-|--------|-------------|-------------|
-| [Kubernetes](plugins/orchestration/kubernetes/) | Container orchestration | `k8s.cluster` |
-| [Docker Swarm](plugins/orchestration/docker-swarm/) | Docker native orchestration | `swarm.cluster` |
-
-**What they do**:
-- Transform stacks to platform format
-- Manage cluster resources
-- Configure auto-scaling
-- Handle rolling updates
-
-## Quick Start
-
-### Installing a Plugin
-
-**Using ARFNI CLI**:
-```bash
-# Install by name (from central registry)
-arfni plugin install django
-
-# Install from GitHub
-arfni plugin install github.com/arfni/arfni-plugins/plugins/frameworks/django
-```
-
-**Using ARFNI GUI**:
-1. Open Settings > Plugins
-2. Enter plugin name or GitHub URL
-3. Click Install
-4. Plugin appears in NodePalette
-
-### Using a Plugin
-
-**Framework Plugin (Django)**:
-```yaml
-# stack.yaml
-apiVersion: v0.1
-name: my-django-app
-targets:
-  local:
-    type: docker-desktop
-
-services:
-  api:
-    kind: docker.container
-    target: local
-    spec:
-      build: ./backend  # Django project detected automatically
-      ports: ["8000:8000"]
-      env:
-        SECRET_KEY: ${DJANGO_SECRET_KEY}
-```
-
-**Infrastructure Plugin (Nginx)**:
-```yaml
-services:
-  api:
-    kind: docker.container
-    spec:
-      build: ./backend
-      # Internal port only
-
-  nginx:
-    kind: proxy.nginx  # Nginx plugin service kind
-    spec:
-      upstreams:
-        - service: api
-          port: 8000
-      ssl:
-        enabled: true
-      ports: ["80:80", "443:443"]
-```
+| Category | Description | Examples |
+|----------|-------------|----------|
+| `framework` | Application frameworks | Django, Express, Spring Boot |
+| `database` | Database systems | PostgreSQL, MySQL, MongoDB |
+| `cache` | In-memory caches | Redis, Memcached |
+| `message_queue` | Message queue systems | RabbitMQ, Kafka |
+| `proxy` | Reverse proxies/load balancers | Nginx, Traefik |
+| `cicd` | CI/CD pipelines | GitHub Actions, Jenkins |
+| `orchestration` | Deployment platforms | Kubernetes, Docker Swarm |
+| `infrastructure` | Infrastructure tools | Terraform, Ansible |
 
 ## Plugin Structure
 
-Every plugin follows this structure:
+A plugin follows this directory structure:
 
 ```
-plugin-name/
-├── plugin.yaml          # Plugin manifest (required)
-├── README.md            # Documentation (required)
-├── LICENSE              # License file (required)
-├── frameworks/          # Framework definitions (framework plugins)
-├── templates/           # File templates
-├── hooks/               # Lifecycle scripts
-├── configs/             # Default configurations
-└── examples/            # Example projects
+plugins/{category}/{plugin-name}/
+├── plugin.yaml              # Plugin manifest (required)
+├── README.md                # Plugin documentation (required)
+├── icon.png                 # Plugin icon (required)
+├── LICENSE                  # License file (optional)
+├── CHANGELOG.md             # Version history (optional)
+├── templates/               # Template files directory
+│   ├── Dockerfile.tmpl
+│   └── config.tmpl
+├── hooks/                   # Lifecycle hook scripts
+│   ├── pre-deploy.sh
+│   ├── post-deploy.sh
+│   └── health-check.sh
+├── frameworks/              # GUI configuration (for framework plugins)
+│   └── {framework}.yaml
+└── examples/                # Example projects
+    └── basic-example/
 ```
 
-### Minimal Plugin
+### Required Files
+
+1. **plugin.yaml** - Plugin metadata and configuration
+2. **README.md** - Usage instructions and documentation
+3. **icon.png** - Icon displayed in GUI (recommended size: 128x128px)
+
+### Optional Files
+
+- **templates/** - File templates to be generated in user projects
+- **hooks/** - Scripts executed at lifecycle events
+- **frameworks/** - GUI configuration for framework plugins
+- **examples/** - Reference example projects
+
+## Writing plugin.yaml
+
+The `plugin.yaml` file is the core manifest of your plugin. Let's explain each section using the Django plugin as reference.
+
+### 1. Metadata (Required)
 
 ```yaml
-# plugin.yaml
-name: my-plugin
-version: 1.0.0
-category: framework  # or: infrastructure, cicd, orchestration
-description: My awesome plugin
-author: your-name
+apiVersion: v0.1              # API version (currently v0.1)
+name: django                  # Plugin ID (lowercase, no spaces)
+displayName: Django           # Display name
+version: 1.0.0               # Semantic versioning
+category: framework          # Plugin category
+description: Production-ready Django web framework
+author: arfni-community      # Author name
+homepage: https://github.com/Arfni/arfni-plugins/tree/main/plugins/frameworks/django
+license: MIT                 # License type
+icon: icon.png              # Icon file path
+```
 
+### 2. Auto-Detection (Optional)
+
+Define rules for automatic project detection:
+
+```yaml
+detection:
+  enabled: true
+  priority: 15                # Detection priority (higher = first)
+  required_files:
+    - manage.py               # Required files list
+    - requirements.txt
+  file_content_patterns:      # File content patterns
+    requirements.txt:
+      contains: ["django", "Django"]
+```
+
+### 3. Provides (Required)
+
+Declare what your plugin provides:
+
+```yaml
 provides:
-  frameworks: [my-framework]  # or service_kinds, target_types
+  frameworks:                 # Framework plugins
+    - django
+  service_kinds:              # Database plugins (e.g., PostgreSQL)
+    - db.postgres
+```
 
+### 4. Requirements (Optional)
+
+```yaml
+requires:
+  arfni_version: ">=0.2.0"
+  docker_version: ">=20.10"
+```
+
+### 5. User Inputs (Required)
+
+Parameters that users can configure:
+
+```yaml
+inputs:
+  python_version:
+    description: "Python runtime version"
+    type: select              # Types: select, text, number, boolean, secret
+    options:
+      - "3.9"
+      - "3.10"
+      - "3.11"
+      - "3.12"
+    default: "3.11"
+    required: true
+
+  django_port:
+    description: "Django application port"
+    type: number
+    default: 8000
+    required: true
+
+  django_secret_key:
+    description: "Django SECRET_KEY"
+    type: secret              # Use secret type for sensitive data
+    required: true
+    env_var: DJANGO_SECRET_KEY  # Automatically set as environment variable
+
+  database_url:
+    description: "Database connection URL"
+    type: text
+    placeholder: "postgresql://user:pass@postgres:5432/dbname"
+    required: false
+    env_var: DATABASE_URL     # Auto-set when connected in canvas
+```
+
+**Input Types:**
+- `select` - Dropdown selection
+- `text` - Text input
+- `number` - Numeric input
+- `boolean` - Checkbox
+- `secret` - Password/token (encrypted)
+
+### 6. Contributes (Required)
+
+Service definitions to be added to stack.yaml:
+
+```yaml
+contributes:
+  services:
+    django:
+      kind: docker.container
+      target: "{{target}}"
+      spec:
+        build:
+          context: "{{project_dir}}"
+          dockerfile: Dockerfile
+        ports:
+          - "{{django_port}}:8000"
+        health:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumes:
+          - host: ./media
+            mount: /app/media
+          - host: ./static
+            mount: /app/static
+
+  canvas:                     # GUI canvas configuration
+    nodeType: django
+    label: Django
+    description: "Python web framework"
+    category: runtime
+    ports:
+      - name: http
+        port: 8000
+        protocol: tcp
+    connections:
+      inputs:                 # Connections this node can receive
+        - type: database
+          name: database
+          protocol: any
+          env_var: DATABASE_URL
+        - type: cache
+          name: redis
+          protocol: tcp
+          env_var: REDIS_URL
+      outputs:                # Connections this node can provide
+        - type: api
+          name: api
+          protocol: http
+
+  volumes:                    # Persistent volumes
+    - postgres_data
+```
+
+### 7. Lifecycle Hooks (Optional)
+
+Scripts executed at specific lifecycle stages:
+
+```yaml
 hooks:
-  pre_deploy: hooks/setup.sh
+  pre_generate:
+    script: hooks/validate-project.sh
+    description: "Validate project structure"
+
+  post_build:
+    script: hooks/collect-static.sh
+    description: "Collect static files"
+
+  pre_deploy:
+    script: hooks/migrate-database.sh
+    description: "Run database migrations"
+
+  post_deploy:
+    script: hooks/create-superuser.sh
+    description: "Create superuser"
+
+  health_check:
+    script: hooks/health-check.sh
+    description: "Verify application health"
 ```
 
-## Contributing
+**Available Hooks:**
+- `pre_generate` - Before config generation
+- `post_generate` - After config generation
+- `pre_build` - Before Docker build
+- `post_build` - After Docker build
+- `pre_deploy` - Before deployment
+- `post_deploy` - After deployment
+- `health_check` - Health verification
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+### 8. Templates (Optional)
 
-### Adding a New Plugin
+Files to be generated in user projects:
 
-1. **Fork this repository**
+```yaml
+templates:
+  - source: templates/Dockerfile.django.tmpl
+    target: "{{project_dir}}/Dockerfile"
+    description: "Multi-stage Dockerfile for Django"
+    overwrite: false          # Don't overwrite existing files
 
-2. **Create plugin directory**:
-   ```bash
-   mkdir -p plugins/frameworks/my-plugin
-   cd plugins/frameworks/my-plugin
-   ```
+  - source: templates/settings_production.py.tmpl
+    target: "{{project_dir}}/settings_production.py"
+    description: "Production settings"
+    overwrite: false
+```
 
-3. **Create required files**:
-   - `plugin.yaml` - Plugin manifest
-   - `README.md` - Usage documentation
-   - `LICENSE` - MIT recommended
+### 9. Documentation (Optional)
 
-4. **Test locally**:
-   ```bash
-   arfni plugin install ./plugins/frameworks/my-plugin
-   ```
+```yaml
+documentation:
+  readme: README.md
+  getting_started: docs/getting-started.md
+  troubleshooting: docs/troubleshooting.md
+```
 
-5. **Submit Pull Request**:
-   - Clear description of plugin functionality
-   - Include usage examples
-   - Ensure tests pass
+### 10. Tags (Optional)
 
-### Plugin Categories
+Tags for search and discovery:
 
-Choose the appropriate category for your plugin:
+```yaml
+tags:
+  - python
+  - django
+  - backend
+  - web-framework
+  - orm
+  - rest-api
+```
 
-- **`framework`**: Helps build/containerize application code
-  - Example: Django, React, Spring Boot
+### 11. Examples (Optional)
 
-- **`infrastructure`**: Adds infrastructure services
-  - Example: Nginx, Redis, PostgreSQL
+```yaml
+examples:
+  - name: basic-blog
+    description: "Simple Django blog application"
+    path: examples/basic-blog/
 
-- **`cicd`**: CI/CD pipeline integration
-  - Example: Jenkins, GitLab CI
+  - name: rest-api
+    description: "Django REST API with JWT"
+    path: examples/rest-api/
+```
 
-- **`orchestration`**: Deployment platform support
-  - Example: Kubernetes, Docker Swarm
+### 12. Changelog (Optional)
 
-## Plugin Registry
+```yaml
+changelog: CHANGELOG.md
+```
 
-All plugins are indexed in [`registry/index.json`](registry/index.json) for discovery and search.
+## Template Files
 
-**Search plugins**:
+Template files use Go template syntax for variable substitution.
+
+### Using Variables
+
+```dockerfile
+# templates/Dockerfile.tmpl
+FROM python:{{python_version}}-slim
+
+WORKDIR /app
+
+# Use default value
+ENV WORKERS={{default "4" .gunicorn_workers}}
+
+EXPOSE {{django_port}}
+
+CMD ["gunicorn", "--workers", "{{gunicorn_workers}}", "--bind", "0.0.0.0:8000"]
+```
+
+### Available Variables
+
+- All variables defined in `inputs`
+- `{{project_dir}}` - Project directory path
+- `{{target}}` - Build target
+- `{{default "default_value" .variable_name}}` - Specify default values
+
+## Lifecycle Hooks
+
+Hook scripts are written in Bash and executed at specific event points.
+
+### Example: Database Migration Hook
+
 ```bash
-arfni plugin search <keyword>
+#!/bin/bash
+# hooks/migrate-database.sh
+
+set -e
+
+echo "Waiting for database to be ready..."
+python manage.py wait_for_db
+
+echo "Running Django migrations..."
+python manage.py migrate --noinput
+
+echo "Migrations completed successfully!"
 ```
 
-**Browse registry**:
-https://raw.githubusercontent.com/arfni/arfni-plugins/main/registry/index.json
+### Example: Health Check Hook
 
-## Documentation
+```bash
+#!/bin/bash
+# hooks/health-check.sh
 
-- **[Plugin Specification](../UNIFIED_PLUGIN_SPECIFICATION.md)** - Complete plugin reference
-- **[Use Cases](../PLUGIN_USE_CASES.md)** - Real-world scenarios
-- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute
+set -e
 
-## Community
+# Check HTTP endpoint
+curl -f http://localhost:8000/health/ || exit 1
 
-- **GitHub Discussions**: [Ask questions, share plugins](https://github.com/arfni/arfni/discussions)
-- **Discord**: [Join our community](https://discord.gg/arfni)
-- **Issues**: [Report bugs, request features](https://github.com/arfni/arfni-plugins/issues)
+# Check database connection
+python manage.py check --database default || exit 1
 
-## License
+echo "Health check passed!"
+```
 
-MIT License - see individual plugin directories for specific licenses.
+### Hook Script Best Practices
 
-## Acknowledgments
+1. **Execute permissions**: Grant execute permissions (`chmod +x hooks/*.sh`)
+2. **Error handling**: Use `set -e` to exit on errors
+3. **Output**: Clearly output progress information
+4. **Environment variables**: Use variables defined with `env_var`
+5. **Exit codes**: Return 0 on success, 1 on failure
 
-Special thanks to all contributors who have helped build this plugin ecosystem!
+## Plugin Development Steps
+
+### Step 1: Create Plugin Directory
+
+```bash
+# Choose appropriate category
+mkdir -p plugins/frameworks/myframework
+cd plugins/frameworks/myframework
+```
+
+### Step 2: Write plugin.yaml
+
+```bash
+# Copy basic template (refer to Django plugin)
+cp -r ../django/plugin.yaml .
+# Modify contents
+```
+
+### Step 3: Write README.md
+
+Write documentation for users:
+
+```markdown
+# MyFramework Plugin
+
+A plugin for using MyFramework with ARFNI.
+
+## Usage
+
+1. Install ARFNI CLI
+2. Run `arfni init` in project directory
+3. Select MyFramework
+
+## Requirements
+
+- MyFramework 2.0+
+- Docker 20.10+
+
+## Configuration
+
+...
+```
+
+### Step 4: Add Icon
+
+Save a 128x128px PNG icon as `icon.png`.
+
+### Step 5: Write Templates (if needed)
+
+```bash
+mkdir templates
+# Write Dockerfile, config files, etc.
+```
+
+### Step 6: Write Hook Scripts (if needed)
+
+```bash
+mkdir hooks
+# Write lifecycle scripts
+chmod +x hooks/*.sh
+```
+
+### Step 7: Local Testing
+
+```bash
+# Test with ARFNI CLI locally
+arfni plugin validate ./plugins/frameworks/myframework
+```
+
+## Validation and Testing
+
+### Automatic Validation
+
+When you commit a plugin, GitHub Actions automatically validates:
+
+- `apiVersion` format check (v0.1)
+- Required fields existence
+- Category validity
+- Version format (semantic versioning)
+- `provides` structure validation
+
+### Manual Testing
+
+1. **Local Validation**
+   ```bash
+   node scripts/generate-registry.js
+   ```
+
+2. **Real Project Testing**
+   ```bash
+   cd /path/to/test-project
+   arfni init
+   # Select and test plugin
+   ```
+
+3. **Docker Build Testing**
+   ```bash
+   docker build -t test-image .
+   docker run -p 8000:8000 test-image
+   ```
+
+### Checklist
+
+Check before submitting your plugin:
+
+- [ ] All required fields in `plugin.yaml` completed
+- [ ] README.md written (including usage and requirements)
+- [ ] icon.png added (128x128px)
+- [ ] Template file variable substitution tested
+- [ ] Hook script execute permissions verified
+- [ ] Local plugin validation successful
+- [ ] Tested in real project
+- [ ] No typos in documentation
+
+## Submitting Your Plugin
+
+### 1. Fork and Clone
+
+```bash
+# Fork repository (on GitHub)
+git clone https://github.com/{your-username}/arfni-plugins.git
+cd arfni-plugins
+```
+
+### 2. Create Branch
+
+```bash
+git checkout -b add-myframework-plugin
+```
+
+### 3. Add Plugin
+
+```bash
+# Write plugin files
+git add plugins/frameworks/myframework/
+git commit -m "feat: add MyFramework plugin"
+```
+
+### 4. Push and Pull Request
+
+```bash
+git push origin add-myframework-plugin
+# Create Pull Request on GitHub
+```
+
+### Pull Request Template
+
+```markdown
+## Plugin Information
+
+- Name: MyFramework
+- Category: framework
+- Version: 1.0.0
+
+## Description
+
+Plugin for MyFramework. Supports the following features:
+- Automatic project detection
+- Automatic Dockerfile generation
+- Production configuration
+
+## Testing Complete
+
+- [x] Local validation passed
+- [x] Tested in real project
+- [x] Docker build successful
+- [x] Documentation complete
+
+## Checklist
+
+- [x] plugin.yaml written
+- [x] README.md written
+- [x] icon.png added
+- [x] Templates tested
+- [x] Hook scripts tested
+```
+
+### 5. Review and Merge
+
+- Maintainers conduct code review
+- Modifications requested if needed
+- Merged to main branch after approval
+- GitHub Actions automatically updates registry
+
+## Additional Resources
+
+- [ARFNI Official Documentation](https://arfni.io/docs)
+- [Django Plugin Example](plugins/frameworks/django/)
+- [PostgreSQL Plugin Example](plugins/database/postgres/)
+- [Issue Tracker](https://github.com/Arfni/arfni-plugins/issues)
+
+## Need Help?
+
+- Post questions in GitHub Issues
+- Join Discord community
+- Refer to existing plugin code
 
 ---
 
-**Made with ❤️ by the ARFNI Community**
+Thank you for contributing to the ARFNI plugin ecosystem! 🚀
