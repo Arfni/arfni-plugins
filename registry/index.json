@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "version": "1.0.0",
-  "last_updated": "2025-11-10T08:40:40.286Z",
+  "last_updated": "2025-11-12T08:24:25.152Z",
   "repository": "https://github.com/Arfni/arfni-plugins",
   "categories": {
     "framework": {
@@ -12,7 +12,7 @@
     "database": {
       "name": "Database Plugins",
       "description": "Persistent data storage solutions",
-      "count": 1
+      "count": 0
     },
     "cache": {
       "name": "Cache Plugins",
@@ -86,62 +86,18 @@
       "stars": 0,
       "verified": true,
       "status": "stable",
-      "last_updated": "2025-11-10T08:40:40.285Z",
+      "last_updated": "2025-11-12T08:24:25.152Z",
       "documentation": {
         "readme": "README.md",
         "getting_started": "docs/getting-started.md",
         "troubleshooting": "docs/troubleshooting.md"
       }
-    },
-    {
-      "id": "postgresql",
-      "name": "Postgresql",
-      "category": "database",
-      "version": "1.0.0",
-      "description": "PostgreSQL relational database",
-      "author": "arfni-community",
-      "homepage": "https://github.com/Arfni/arfni-plugins/tree/main/plugins/database/postgresql",
-      "license": "MIT",
-      "path": "plugins/database/postgresql",
-      "repository": {
-        "owner": "Arfni",
-        "repo": "arfni-plugins",
-        "branch": "main"
-      },
-      "provides": {
-        "service_kinds": [
-          "db.postgres"
-        ],
-        "frameworks": []
-      },
-      "requires": {
-        "arfni_version": ">=0.2.0",
-        "docker_version": ">=20.10"
-      },
-      "tags": [
-        "database",
-        "postgresql",
-        "postgres",
-        "sql",
-        "relational",
-        "rdbms",
-        "acid"
-      ],
-      "icon": "icon.png",
-      "downloads": 0,
-      "stars": 0,
-      "verified": true,
-      "status": "stable",
-      "last_updated": "2025-11-10T08:40:40.286Z",
-      "documentation": {
-        "readme": "README.md"
-      }
     }
   ],
   "stats": {
-    "total_plugins": 2,
+    "total_plugins": 1,
     "total_downloads": 0,
     "categories_count": 8,
-    "last_sync": "2025-11-10T08:40:40.294Z"
+    "last_sync": "2025-11-12T08:24:25.152Z"
   }
 }
