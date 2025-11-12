@@ -14,6 +14,7 @@ Welcome to the ARFNI plugin repository! This guide explains how to contribute ne
 - [Lifecycle Hooks](#lifecycle-hooks)
 - [Plugin Development Steps](#plugin-development-steps)
 - [Validation and Testing](#validation-and-testing)
+- [Testing Your Plugin in ARFNI GUI](#testing-your-plugin-in-arfni-gui)
 - [Submitting Your Plugin](#submitting-your-plugin)
 
 ## What is a Plugin?
@@ -514,6 +515,164 @@ Check before submitting your plugin:
 - [ ] Local plugin validation successful
 - [ ] Tested in real project
 - [ ] No typos in documentation
+
+## Testing Your Plugin in ARFNI GUI
+
+After developing your plugin locally, you should test it in the ARFNI GUI before submitting. This ensures your plugin works correctly in the actual user environment.
+
+### Interactive Testing Tutorial
+
+ARFNI GUI provides an interactive plugin testing tutorial page at `/plugin-test`. This page includes:
+
+- **Step-by-step testing guide** - Walk through the entire plugin testing process
+- **Testing checklist** - Ensure you've validated all aspects of your plugin
+- **Common issues and solutions** - Troubleshooting guide for frequent problems
+- **Best practices** - Tips for creating reliable plugins
+
+To access the tutorial:
+
+1. Start ARFNI GUI in development mode
+2. Navigate to `http://localhost:1420/plugin-test` (or use the navigation menu)
+3. Follow the interactive steps to test your plugin
+
+### Quick Testing Steps
+
+#### 1. Link Your Plugin Directory
+
+Configure ARFNI to load plugins from your local development directory:
+
+**Option A: Environment Variable (Recommended)**
+```bash
+# Set the plugin directory path
+export ARFNI_PLUGIN_DIR="/path/to/arfni-plugins"
+
+# Start ARFNI GUI
+cd arfni-gui
+npm run tauri dev
+```
+
+**Option B: Symlink Method**
+```bash
+# Create a symbolic link
+ln -s /path/to/arfni-plugins/plugins ~/.arfni/plugins
+```
+
+**Option C: Configuration File**
+```bash
+# Edit ~/.arfni/config.json
+{
+  "pluginDirectory": "/path/to/arfni-plugins/plugins"
+}
+```
+
+#### 2. Validate Plugin Loading
+
+```bash
+# Run the registry generation script
+cd scripts
+npm install
+node generate-registry.js
+
+# Check for your plugin in the output
+# Your plugin should appear without validation errors
+```
+
+#### 3. Test in GUI
+
+1. **Start ARFNI GUI**
+   ```bash
+   cd arfni-gui
+   npm run tauri dev
+   ```
+
+2. **Create Test Project**
+   - Go to Projects page
+   - Create a new project
+   - Your plugin should appear in the available plugins list
+
+3. **Add Plugin to Canvas**
+   - Open the canvas editor
+   - Drag your plugin from the sidebar
+   - Configure it with test values
+
+4. **Generate Files**
+   - Use the "Generate" feature
+   - Verify that template files are created correctly
+   - Check that variables are substituted properly
+
+5. **Test Deployment**
+   - Deploy the project
+   - Verify lifecycle hooks execute successfully
+   - Check that the application runs without errors
+
+### Testing Checklist
+
+Before submitting your plugin, verify:
+
+#### File Structure
+- [ ] `plugin.yaml` exists and is valid
+- [ ] `README.md` with clear documentation
+- [ ] `icon.png` is exactly 128x128 pixels
+- [ ] All template files use correct Go template syntax
+- [ ] Hook scripts have execute permissions (`chmod +x`)
+
+#### plugin.yaml Validation
+- [ ] `apiVersion` follows v0.1 format
+- [ ] Version uses semantic versioning (X.Y.Z)
+- [ ] Category is one of the 8 valid categories
+- [ ] Has either `frameworks` or `service_kinds` in `provides`
+- [ ] Author information is complete
+- [ ] All required environment variables are documented
+
+#### Functional Testing
+- [ ] Plugin loads in ARFNI GUI without errors
+- [ ] Plugin appears in the correct category
+- [ ] Icon displays correctly in GUI
+- [ ] Configuration inputs render properly
+- [ ] Template files generate with correct values
+- [ ] Lifecycle hooks execute successfully
+- [ ] Works with different input combinations
+
+#### Deployment Testing
+- [ ] Generated Docker container builds successfully
+- [ ] Application runs without errors
+- [ ] Health checks pass (if implemented)
+- [ ] Port mappings work correctly
+- [ ] Environment variables are set properly
+
+### Common Testing Issues
+
+#### Plugin Not Appearing in GUI
+- Verify `ARFNI_PLUGIN_DIR` is set correctly
+- Run `generate-registry.js` and check for validation errors
+- Restart ARFNI GUI after adding the plugin
+- Check browser console for loading errors
+
+#### Template Not Generating Correctly
+- Verify Go template syntax (use `{{ .VariableName }}`)
+- Check that variable names match `contributes.environment`
+- Test templates with minimal values first
+
+#### Hook Script Failing
+- Ensure script has execute permissions (`chmod +x`)
+- Add `#!/bin/bash` shebang at the top
+- Test script independently before integration
+- Check Tauri backend logs for detailed error messages
+
+### Debug Mode
+
+For detailed debugging information:
+
+```bash
+# Enable debug logging
+export ARFNI_DEBUG=true
+export RUST_LOG=debug
+
+# Start ARFNI GUI
+npm run tauri dev
+```
+
+This will show detailed logs about plugin loading, validation, and execution.
 
 ## Submitting Your Plugin
 

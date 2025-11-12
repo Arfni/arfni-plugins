@@ -43,45 +43,8 @@ inputs:
       - "3.11"
       - "3.12"
     default: "3.11"
-    required: true
-
-  django_port:
-    description: "Django application port"
-    type: number
-    default: 8000
-    required: true
-
-  django_secret_key:
-    description: "Django SECRET_KEY for cryptographic signing"
-    type: secret
-    required: true
-    env_var: DJANGO_SECRET_KEY
-
-  database_url:
-    description: "Database connection URL (automatically set when connecting DB service in canvas)"
-    type: text
-    placeholder: "postgresql://user:pass@postgres:5432/dbname"
     required: false
-    env_var: DATABASE_URL
-
-  redis_url:
-    description: "Redis connection URL (automatically set when connecting Redis service in canvas)"
-    type: text
-    placeholder: "redis://redis:6379/0"
-    required: false
-    env_var: REDIS_URL
-
-  debug_mode:
-    description: "Enable Django debug mode (not recommended for production)"
-    type: boolean
-    default: false
-    required: false
-
-  gunicorn_workers:
-    description: "Number of Gunicorn worker processes"
-    type: number
-    default: 4
-    required: false
+    scope: build
 
 # Service contributions to stack.yaml
 contributes:
