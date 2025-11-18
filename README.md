@@ -1,5 +1,7 @@
 # ARFNI Plugin Development Guide
 
+**English** | [한국어](README.ko.md)
+
 Welcome to the ARFNI plugin ecosystem! This guide shows you how to create and test plugins for ARFNI.
 
 ## Quick Start
