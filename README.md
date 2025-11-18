@@ -6,7 +6,7 @@ Welcome to the ARFNI plugin ecosystem! This guide shows you how to create and te
 
 ## Quick Start
 
-### 1. Create Your Plugin
+### 1. Create Your Plugindsaffasdasdf
 
 Create a folder structure like this:
 
